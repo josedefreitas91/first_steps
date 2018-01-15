@@ -7,7 +7,7 @@
 	<h1 class="display-2">Página no encontrada</h1>
 	
 	<div class="alert alert-danger" role="alert">
-		Error 404
+		Error 404: Ha ocurrido un error y no se ha encontrado la página!
 	</div>
 
 	<div class="alert alert-info" role="alert">
