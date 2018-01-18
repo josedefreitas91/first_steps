@@ -17,7 +17,6 @@ class UserController extends Controller
     	// return view('users.index')
     	// 	->with('users', $users)
     	// 	->with('title', $title);
-
 		return view('users.index', compact('users', 'title'));
     }
 
@@ -38,7 +37,21 @@ class UserController extends Controller
     }
 
     public function store(){
-        $data = request()->all();
+        $data = request()->validate([
+            'name' => 'required',
+            // 'email' => 'required',
+            // 'password' => 'required'
+        ], [
+            'name.required' => 'El campo es obligatorio'
+        ]
+
+        );
+
+        // if(empty($data['name'])){
+        //     return redirect()->route('users.create')->withErrors([
+        //         'name' => 'El campo es obligatorio'
+        //     ]);
+        // }
 
         User::create([
             'name' => $data['name'],
