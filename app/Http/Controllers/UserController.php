@@ -37,15 +37,23 @@ class UserController extends Controller
     }
 
     public function store(){
+
+		// devolver los valores de los campos de forma manual cuando hay errores
+        // return redirect()->route('users')->withInput();
+
         $data = request()->validate([
             'name' => 'required',
-            // 'email' => 'required',
-            // 'password' => 'required'
+            // 'email' => 'required|email',
+            'email' => ['required', 'email','unique:users,email'],
+            'password' => 'required|min:6'
         ], [
-            'name.required' => 'El campo es obligatorio'
-        ]
-
-        );
+        	// para todos los campos
+            'required' => 'El campo es obligatorio',
+            'password.min' => 'Debe ser mayor a 6 carácteres',
+            // un campo en especifico
+            // 'email.required' => 'El campo es obligatorio',
+            // 'password.required' => 'El campo es obligatorio',
+        ]);
 
         // if(empty($data['name'])){
         //     return redirect()->route('users.create')->withErrors([
