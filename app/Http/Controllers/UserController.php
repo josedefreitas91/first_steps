@@ -71,8 +71,17 @@ class UserController extends Controller
         return redirect()->route('users');
     }
 
-    public function edit($id){
-    	return "Editando detalles del usuario: {$id}";
+    public function edit(User $user){
+    	// return "Editando detalles del usuario: {$id}";
+    	return view('users.edit', ['user' => $user]);
+    }
+
+    public function update(User $user){
+
+    	$data = request()->all();
+    	$data['password'] = bcrypt($data['password']);
+    	$user->update($data);
+    	return redirect()->route('users.show', ['user' => $user]);
     }
 
 }

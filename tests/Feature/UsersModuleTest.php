@@ -150,7 +150,7 @@ class UsersModuleTest extends TestCase
     function the_email_must_be_unique(){
         // $this->withoutExceptionHandling();
 
-        factory(Profession::class)->times(18)->create();
+        factory(Profession::class)->times(20)->create();
         factory(User::class)->create([
             'email' => 'jose@gregorio.com'
         ]);
@@ -195,6 +195,67 @@ class UsersModuleTest extends TestCase
             ->assertSessionHasErrors(['password']);
 
         $this->assertEquals(0, User::count());
+    }
+
+    /** @test */
+    function it_loads_the_edit_user_page()
+    {
+        factory(Profession::class)->times(20)->create();
+
+        $user = factory(User::class)->create();
+
+        $this->get("/usuarios/{$user->id}/editar")
+            ->assertStatus(200)
+            ->assertViewIs('users.edit')
+            ->assertSee('Editar Usuario')
+            //que posea dicha variable en la vista
+            ->assertViewHas('user', function($viewUser) use ($user){
+                return $viewUser->id == $user->id;
+            });
+    }
+
+    /** @test */
+    function it_updates_a_user(){
+
+        $this->withoutExceptionHandling();
+
+        factory(Profession::class)->times(20)->create();
+        $user = factory(User::class)->create();
+
+        $this->put("/usuarios/{$user->id}", [
+                'name' => 'Jose',
+                'email' => 'jose@gregorio.com',
+                'password' => '123456'
+            ])
+            ->assertRedirect("/usuarios/{$user->id}");
+
+        $this->assertCredentials([
+            'name' => 'Jose',
+            'email' => 'jose@gregorio.com',
+            'password' => '123456'
+        ]);
+    }
+
+    /** @test */
+    function the_name_is_required_when_updating_a_user(){
+        // $this->withoutExceptionHandling();
+        factory(Profession::class)->times(18)->create();
+        $user = factory(User::class)->create();
+
+        $this->from("/usuarios/{$user->id}/editar")
+            ->put("/usuarios/{$user->id}", [
+                'name' => '',
+                'email' => 'jose@gregorio.com',
+                'password' => '123456'
+            ])
+            ->assertRedirect("/usuarios/{$user->id}/editar");
+            // ->assertSessionHasErrors(['name' => 'El campo es obligatorio']);
+
+        $this->assertEquals(0, User::count());
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'jose@gregorio.com'
+        ]);
     }
 
 }
